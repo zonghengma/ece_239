@@ -21,4 +21,4 @@ class ThreeLayerFcNet(BaseModel):
     model.add(layers.Activation('softmax'))
 
     # Super function will handle the rest of the generic model setup.
-    super().__init__(model, name, hyperparams)
+    super().__init__(model, name, hyperparams, archparams)

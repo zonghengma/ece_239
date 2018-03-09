@@ -1,5 +1,6 @@
 from neural_net.data_access.read_project_data import DataReader
 from neural_net.architecture.fc_nets import ThreeLayerFcNet
+from neural_net.data_process.data_processor import DataProcessor
 from keras.datasets import mnist
 from keras.utils import np_utils
 import numpy as np
@@ -27,6 +28,7 @@ data = {
 archparams = {}
 archparams['hidden_units'] = [50, 100, 10]
 archparams['input_dim'] = 784
+archparams['dummy_val'] = 10230
 
 # Set regular hyperparameters.
 hyperparams = {}
@@ -34,9 +36,9 @@ hyperparams['optimizer'] = 'adam'
 hyperparams['learning_rate'] = 1e-3
 hyperparams['lr_decay'] = 0.001
 hyperparams['loss_function'] = 'categorical_crossentropy'
-hyperparams['batch_size'] = 64
+hyperparams['batch_size'] = 128
 hyperparams['epochs'] = 10
-hyperparams['verbose'] = 0
+hyperparams['verbose'] = 2
 
 # Create the network.
 fc_net = ThreeLayerFcNet(hyperparams, archparams)
@@ -44,4 +46,4 @@ fc_net.train(data)
 
 # Process the data.
 data_processor = DataProcessor(fc_net)
-data_processor.save_data()
+data_processor.save_data_csv(save_history=True)

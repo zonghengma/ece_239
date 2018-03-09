@@ -1,4 +1,5 @@
 import keras.optimizers as optimizers
+import keras.callbacks
 
 class BaseModel(object):
   """Base class representing a complete neural net architecture.
@@ -11,12 +12,16 @@ class BaseModel(object):
     model: The keras model to save.
     name: String of unique name for the model. Every different architecture
           should have a uniquely identifying name.
-    params: The params that are unique to this architecture that will be
-            used to compare to other runs of this same architecture.
-            A dictionary of {'param': value, 'param': value}.
-
+    hyperparams: The params that are unique to this architecture that will be
+                 used to compare to other runs of this same architecture.
+                 A dictionary of {'param': value, 'param': value}.
+    archparams: The params that are unique the actual model. These are not
+                directly used by the BaseModel class, but only saved so
+                that they can be reported by the base class's save function.
+                A dictionary of {'param': value, 'param': value}.
+    history: Keras History object for saving the model performance history.
   """
-  def __init__(self, keras_model, name, hyperparams):
+  def __init__(self, keras_model, name, hyperparams, archparams):
     """Set and compile the model, everything before model.fit().
 
     Args:
@@ -30,17 +35,45 @@ class BaseModel(object):
     """
     self.__model = keras_model
     self.__name = name
-    self.__params = hyperparams
+    self.__hyperparams = hyperparams
+    self.__archparams = archparams
     self.__compile()
 
   def get_model(self):
     return self.__model
 
-  def get_parameters(self):
-    return self.__params
-
   def get_name(self):
     return self.__name
+
+  def get_history(self):
+    return self.__history
+
+  def get_params(self):
+    """Returns all the parameters used in this model.
+
+    Returns both the hyperparams and archparams in a single dictionary.
+    Performs escaping of data so that it can be directly input into a CSV
+    writer and written line-by-line.
+
+    Returns:
+      Dictionary of {param: value, param: value}
+    """
+    params = {}
+    for k, v in self.__hyperparams.items():
+      # Unconditionally add these since can't have any errors.
+      params[k] = v
+
+    for k, v in self.__archparams.items():
+      # Raise an error if there's any parameter overlap.
+      if k in params:
+        raise Error('Found duplicate key in archparams and hyperparams: ' +
+                    k + ', cannot have duplicate keys')
+      params[k] = v
+
+    # Insert name.
+    params['model_name'] = self.__name
+
+    return params
 
   def train(self, training_data):
     """Performs the network training step using the input data.
@@ -56,7 +89,7 @@ class BaseModel(object):
     """
     # Gather parameters>
     model = self.__model
-    params = self.__params
+    params = self.__hyperparams
     X_train = training_data['X_train']
     y_train = training_data['y_train']
     validation_data = (training_data['X_val'], training_data['y_val'])
@@ -65,12 +98,13 @@ class BaseModel(object):
     verbose = params['verbose']
 
     # Perform the actual training.
-    model.fit(x=X_train, y=y_train, batch_size=batch_size, epochs=epochs,
-              verbose=verbose, validation_data=validation_data)
+    self.__history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
+                               epochs=epochs, verbose=verbose,
+                               validation_data=validation_data)
 
   def __compile(self):
     """Helper function that calls the compile function of the model."""
-    params = self.__params
+    params = self.__hyperparams
     optimizer = self.__create_optimizer()
     loss_function = params['loss_function']
 
@@ -89,7 +123,7 @@ class BaseModel(object):
       into the model. Add to the model at compile time by calling
       model.compile(..., optimizer=<returned value>)
     """
-    hyperparams = self.__params
+    hyperparams = self.__hyperparams
     # The name of the optimizer to use is set by optimizer param.
     optimizer = hyperparams['optimizer']
     # Load parameters common to all optimizers.
