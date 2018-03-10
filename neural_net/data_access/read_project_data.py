@@ -30,18 +30,6 @@ class DataReader(object):
     '''
     self.dataset_filepath = path
     self.raw_data = dict()
-    #df = self.__dataset_filepath
-    ## Grab only the mat files in the directory.
-    #dir_files = os.listdir(self.__dataset_filepath)
-    #files = [file for file in dir_files if '.mat' in file]
-    #mat_file_refs = [os.path.join(df, file) for file in files]
-
-    ## Go through each mat file, open it, get the data in the sample
-    ## data format, and then save it into self.data.
-    #self.raw_data = []
-    #for file_ref in mat_file_refs:
-    #    X, y = self.__read_file(file_ref)
-    #    self.raw_data.append({'X': X, 'y': y})
 
     for i in range(1, 10):
       file_name = "A0" + str(i) + "T_slice.mat"
@@ -109,4 +97,19 @@ class DataReader(object):
     np.savez(path, X_train = X_tr, y_train = y_tr, X_val = X_va, y_val = y_va, X_test = X_te, y_test = y_te)
 
 class DataLoader(object):
-  pass
+  def __init__(self, path = ""):
+    self.processed_filepath = path
+    if self.processed_filepath == "":
+      self.processed_filepath = os.path.join("processed_datasets", "processed_data")
+    if ".npz" not in self.processed_filepath:
+      self.processed_filepath += ".npz"
+    
+  def load(self):
+    data = np.load(self.processed_filepath)
+    X_train = data["X_train"]
+    y_train = data["y_train"]
+    X_val = data["X_val"]
+    y_val = data["y_val"]
+    X_test = data["X_test"]
+    y_test = data["y_test"]
+    return (X_train.transpose(0,2,1), y_train, X_val.transpose(0,2,1), y_val, X_test.transpose(0,2,1), y_test) 
