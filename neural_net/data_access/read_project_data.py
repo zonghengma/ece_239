@@ -11,17 +11,15 @@ class DataReader(object):
       Attributes:
           dataset_filepath: The filepath for the project_dataset
                               directory that contains the EEG data.
-          raw_data: List of dictionaries of data that is in the same format as
+          raw_data: Dictionaries of data that is in the same format as
                 the sample provided by the professor. The list format is:
-                [
-                  {'X', x_data,
-                   'y', y_data
-                  },
-                  {'X', x_data,
-                   'y', y_data
-                  },
-                  etc
-                ]
+                  {
+                    'X1': X of subject 1,
+                    'y1': y of subject 1,
+                    'X2': X of subject 2,
+                    'y2': y of subject 2,
+                    ...
+                  }
                 Each list item is a subject, [A01T_slice, ..., A09T_slice]
   '''
 
@@ -39,23 +37,23 @@ class DataReader(object):
       self.raw_data["X" + str(i)] = X
       self.raw_data["y" + str(i)] = y
 
-  def preprocess(self, train_subject, test_subject, file_name="processed_data", file_path="processed_datasets/"):
-    if train_subject != test_subject and len([i for i in test_subject if i in train_subject]) > 0:
+  def preprocess(self, train_subjects, test_subjects, file_path=""):
+    if train_subjects != test_subjects and len([i for i in test_subjects if i in train_subjects]) > 0:
       raise ValueError("Invalid input")
 
-    if train_subject == test_subject:
-      X_all = np.concatenate([self.raw_data["X" + str(i)] for i in train_subject])
-      y_all = np.concatenate([self.raw_data["y" + str(i)] for i in train_subject])
+    if train_subjects == test_subjects:
+      X_all = np.concatenate([self.raw_data["X" + str(i)] for i in train_subjects])
+      y_all = np.concatenate([self.raw_data["y" + str(i)] for i in train_subjects])
       test_index, train_val_index = self.__reservoir_sampling(X_all.shape[0], int(X_all.shape[0] * 0.1))
       X_test = X_all[test_index]
       y_test = y_all[test_index]
       X_train_val = X_all[train_val_index]
       y_train_val = y_all[train_val_index]
     else:
-      X_train_val = np.concatenate([self.raw_data["X" + str(i)] for i in train_subject])
-      y_train_val = np.concatenate([self.raw_data["y" + str(i)] for i in train_subject])
-      X_test = np.concatenate([self.raw_data["X" + str(i)] for i in test_subject])
-      y_test = np.concatenate([self.raw_data["y" + str(i)] for i in test_subject])
+      X_train_val = np.concatenate([self.raw_data["X" + str(i)] for i in train_subjects])
+      y_train_val = np.concatenate([self.raw_data["y" + str(i)] for i in train_subjects])
+      X_test = np.concatenate([self.raw_data["X" + str(i)] for i in test_subjects])
+      y_test = np.concatenate([self.raw_data["y" + str(i)] for i in test_subjects])
 
     val_index, train_index = self.__reservoir_sampling(X_train_val.shape[0], int(X_train_val.shape[0] * 0.1))
     X_val = X_train_val[val_index]
@@ -63,7 +61,7 @@ class DataReader(object):
     X_train = X_train_val[train_index]
     y_train = y_train_val[train_index]
 
-    self.__write_file(X_train, y_train, X_val, y_val, X_test, y_test, file_name, file_path)
+    self.__write_file(X_train, y_train, X_val, y_val, X_test, y_test, file_path)
 
   
   def __reservoir_sampling(self, data_length, output_length):
@@ -72,7 +70,8 @@ class DataReader(object):
     for i in range(output_length, data_length):
       rand = random.randint(0, i)
       if rand < output_length:
-        reservoir[rand] = i
+        reservoir[i], reservoir[rand] = reservoir[rand], reservoir[i]
+        #reservoir[rand] = i
     return sorted(reservoir[:output_length]), sorted(reservoir[output_length:])
 
   def __read_file(self, filepath):
@@ -90,11 +89,10 @@ class DataReader(object):
     y = np.asarray(y, dtype=np.int32)
     return X, y
 
-  def __write_file(self, X_tr, y_tr, X_va, y_va, X_te, y_te, file_name, file_path):
-    if ".npz" not in file_name:
-      file_name += ".npz"
-    path = os.path.join(file_path, file_name)
-    np.savez(path, X_train = X_tr, y_train = y_tr, X_val = X_va, y_val = y_va, X_test = X_te, y_test = y_te)
+  def __write_file(self, X_tr, y_tr, X_va, y_va, X_te, y_te, file_path):
+    if ".npz" not in file_path:
+      file_path += ".npz"
+    np.savez(file_path, X_train = X_tr, y_train = y_tr, X_val = X_va, y_val = y_va, X_test = X_te, y_test = y_te)
 
 class DataLoader(object):
   def __init__(self, path = ""):
