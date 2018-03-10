@@ -3,36 +3,39 @@ from base_model import BaseModel
 from keras.models import Sequential
 from keras.layers import LSTM, Dense
 
-class StackedLSTM(BaseModel):
+class StackedLSTM(object):
   def __init__(self, hyperparams):
     self.activation = hyperparams.get('activation', 'tanh')
     self.dropout = hyperparams.get('dropout', 0)
-    self.hidden_dims = hyperparams['hidden_dims']
-    self.timestep = 1000
-    self.channels = 25
+    self.hidden_dims = hyperparams.get('hidden_dims', [32, 32, 32])
+    self.timestep = hyperparams.get('timestep', 1000)
+    self.channels = hyperparams.get('channels', 25)
+    self.model = self.construct_model()
 
-  def get_model(self):
-    self.__model = Sequential()
-    self.__model.add(LSTM(self.hidden_dims[0], 
+  def construct_model(self):
+    model = Sequential()
+    model.add(LSTM(self.hidden_dims[0], 
                           return_sequence=len(self.hidden_dims) > 1,
                           activation=self.activation,
                           dropout=self.dropout,
                           input_shape=(self.timestep, self.channels)))
     for i in range(1, len(self.hidden_dims)-1):
-      self.__model.add(LSTM(self.hidden_dims[i], 
+      model.add(LSTM(self.hidden_dims[i], 
                             return_sequence=True,
                             activation=self.activation,
                             dropout=self.dropout))
     if len(self.hidden_dims) > 1:
-      self.__model.add(LSTM(self.hidden_dims[-1],
+      model.add(LSTM(self.hidden_dims[-1],
                             activation=self.activation,
                             dropout=self.dropout))
-    self.__model.add(Dense(4, activation='softmax'))
+    model.add(Dense(4, activation='softmax'))
+    return model
 
-    return self.__model
+  def get_model(self):
+    return self.model
 
-class CNNLSTM(BaseModel):
-  def __init__():
+class CNNLSTM(object):
+  def __init__(self, ):
     pass
 
   def get_model(self):
