@@ -1,0 +1,8 @@
+To create a custom architecture that automatically analyzes and saves data:
+- Create a new class that inherits from base_model.BaseModel
+- Define the constructor to accept two parameters: hyperparams and archparams
+- Add your architecture's layers using any architecture-specific parameters defined in archparams.
+- Call parent's constructor with __init__(model, name, hyperparams, archparams)
+- Simple example: fc_nets.ThreeLayerFcNet
+
+Don't bother with model.compile() or model.fit(), since the parent class handles all of that and the hyperparameter passing for you. Just focus on defining the input shapes and using the archparams that you need.
