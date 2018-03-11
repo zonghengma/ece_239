@@ -23,8 +23,8 @@ class StackedLSTM(BaseModel):
     self.dense_units = archparams.get('dense_units', [1024])
     self.dense_dropout = archparams.get('dense_dropout', 0)
     self.input_dim = archparams.get('input_dim', (288, 1000, 25))
-    self.timestep = self.input_dim(1)
-    self.channels = self.input_dim(2)
+    self.timestep = self.input_dim[1]
+    self.channels = self.input_dim[2]
     model = self.construct_model()
 
     super().__init__(model, 'StackedLSTM', hyperparams, archparams)
