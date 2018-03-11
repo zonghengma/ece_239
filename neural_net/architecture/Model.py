@@ -34,7 +34,7 @@ class StackedLSTM(BaseModel):
 
     # at least one LSTM layer
     model.add(LSTM(self.lstm_units[0], 
-                          return_sequence=len(self.lstm_units) > 1,
+                          return_sequences=len(self.lstm_units) > 1,
                           activation=self.lstm_act,
                           dropout=self.lstm_dropout,
                           input_shape=(self.timestep, self.channels)))
@@ -42,7 +42,7 @@ class StackedLSTM(BaseModel):
     # LSTM layers in the middle
     for i in range(1, len(self.lstm_units)-1):
       model.add(LSTM(self.lstm_units[i], 
-                            return_sequence=True,
+                            return_sequences=True,
                             activation=self.lstm_act,
                             dropout=self.lstm_dropout))
     
@@ -115,7 +115,7 @@ class CNNLSTM(BaseModel):
     # define LSTM model
     for i in range(len(self.lstm_units)-1):
       model.add(LSTM(self.lstm_units[i], 
-                    return_sequence=True,
+                    return_sequences=True,
                     activation=self.lstm_act,
                     dropout=self.lstm_dropout))
     model.add(LSTM(self.lstm_units[-1],
