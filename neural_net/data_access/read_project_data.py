@@ -23,7 +23,7 @@ class DataReader(object):
                 Each list item is a subject, [A01T_slice, ..., A09T_slice]
   '''
 
-  def __init__(self, path = "project_datasets/"):
+  def __init__(self, path = "project_datasets/", split = True):
     ''' Accesses the project dataset directory and saves the data.
     '''
     self.dataset_filepath = path
@@ -34,8 +34,11 @@ class DataReader(object):
       file_path = os.path.join(self.dataset_filepath, file_name)
     
       X, y = self.__read_file(file_path)
+      y = self.__one_hot_encode(y)
+      if split:
+        X, y = self.__split(X, y)
       self.raw_data["X" + str(i)] = X
-      self.raw_data["y" + str(i)] = self.__one_hot_encode(y)
+      self.raw_data["y" + str(i)] = y
 
   def preprocess(self, train_subjects, test_subjects, file_path=""):
     if train_subjects != test_subjects and len([i for i in test_subjects if i in train_subjects]) > 0:
@@ -67,6 +70,14 @@ class DataReader(object):
     res = np.zeros((y.shape[0], 4))
     res[np.arange(y.shape[0]), y.astype(int)-769] = 1
     return res
+
+  def __split(self, X, y): 
+    resX = np.concatenate(np.split(X, 8, axis=2))
+    resY = np.zeros((y.shape[0] * 8, y.shape[1]))
+    for i in range(y.shape[0] * 8):
+      resY[i, :] = y[i % 8, :]
+    return resX, resY
+        
 
   
   def __reservoir_sampling(self, data_length, output_length):
