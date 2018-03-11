@@ -35,7 +35,7 @@ class DataReader(object):
     
       X, y = self.__read_file(file_path)
       self.raw_data["X" + str(i)] = X
-      self.raw_data["y" + str(i)] = y
+      self.raw_data["y" + str(i)] = self.__one_hot_encode(y)
 
   def preprocess(self, train_subjects, test_subjects, file_path=""):
     if train_subjects != test_subjects and len([i for i in test_subjects if i in train_subjects]) > 0:
@@ -62,6 +62,11 @@ class DataReader(object):
     y_train = y_train_val[train_index]
 
     self.__write_file(X_train, y_train, X_val, y_val, X_test, y_test, file_path)
+
+  def __one_hot_encode(self, y):
+    res = np.zeros((y.shape[0], 4))
+    res[np.arange(y.shape[0]), y.astype(int)-769] = 1
+    return res
 
   
   def __reservoir_sampling(self, data_length, output_length):
