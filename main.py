@@ -74,7 +74,7 @@ hyperparams['verbose'] = 2
 #net = StackedLSTM(hyperparams, archparams)
 #net.train(data)
 cnn = CNNLSTM(hyperparams, archparams)
-cnn.train()
+cnn.train(data)
 
 # Process the data.
 #data_processor = DataProcessor(fc_net)

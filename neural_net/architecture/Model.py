@@ -121,14 +121,15 @@ class CNNLSTM(BaseModel):
                                         padding='same',
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer)),
                                         input_shape=self.input_shape))
-        pdb.set_trace()
+        #pdb.set_trace()
       else:
         model.add(TimeDistributed(Conv2D(self.conv_units[i],
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
-      model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
+      #pdb.set_trace()
+      #model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
     model.add(TimeDistributed(Flatten()))
     # define LSTM model
     for i in range(len(self.lstm_units)-1):
