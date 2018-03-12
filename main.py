@@ -18,15 +18,17 @@ import numpy as np
 #y_main = np_utils.to_categorical(y_main_raw)
 #y_test = np_utils.to_categorical(y_test_raw)
 #<<<<<<< HEAD
-#dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
+dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
 #=======
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\sample.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
 #>>>>>>> 02f24cb2aa27da9dffc2fc13176bfd0c1a7da21f
 #num_class = y_test.shape[1]
 #num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
+X_train = X_train.reshape(X_train.shape[0],X_train.shape[1], X_train.shape[2], X_train.shape[3], 1)
+X_val = X_val.reshape(X_val.shape[0],X_val.shape[1], X_val.shape[2], X_val.shape[3], 1)
 #data = {
 #  'X_train': X_main[shuffle_train_idx],
 #  'y_train': y_main[shuffle_train_idx],
@@ -69,13 +71,13 @@ hyperparams['verbose'] = 2
 # Create the network.
 #fc_net = ThreeLayerFcNet(hyperparams, archparams)
 #fc_net.train(data)
-net = StackedLSTM(hyperparams, archparams)
-net.train(data)
-#cnn = CNNLSTM(hyperparams, archparams)
-#cnn.train()
+#net = StackedLSTM(hyperparams, archparams)
+#net.train(data)
+cnn = CNNLSTM(hyperparams, archparams)
+cnn.train()
 
 # Process the data.
 #data_processor = DataProcessor(fc_net)
-#data_processor = DataProcessor(cnn)
-data_processor = DataProcessor(net)
+data_processor = DataProcessor(cnn)
+#data_processor = DataProcessor(net)
 data_processor.save_data_csv(save_history=True)
