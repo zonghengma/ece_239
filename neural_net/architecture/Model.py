@@ -3,6 +3,7 @@ from neural_net.architecture.base_model import BaseModel
 from keras.models import Sequential
 from keras import regularizers
 from keras.layers import LSTM, Dense, TimeDistributed, Conv2D, Dropout, MaxPooling2D, Flatten
+from keras.layers import BatchNormalization
 
 class StackedLSTM(BaseModel):
   def __init__(self, hyperparams, archparams):
@@ -63,6 +64,7 @@ class StackedLSTM(BaseModel):
                       activation='relu',
                       kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
       model.add(Dropout(self.dense_dropout))
+      model.add(BatchNormalization())
     model.add(Dense(4, activation='softmax'))
     return model
 
@@ -71,7 +73,7 @@ class CNNLSTM(BaseModel):
     """
     architecture: [conv-maxpool]xN - [flatten] - [lstm]xM - [Dense]xK
     archparams:
-      input_dim: input dimensions(rows, cols, timestep), default is (4, 6, 1)
+      input_dim: input dimensions(rows, cols, timestep), default is (6, 7, 1)
       kernel_regularizer: penalty rate of l2 regularization
       conv_units: number of units in each conv layer, default is [64, 64, 64]
       conv_activation: convolution activation, default is relu
@@ -86,7 +88,7 @@ class CNNLSTM(BaseModel):
       dense_units: number of units in each hidden dense layer, default is [1024]
       dense_dropout: dense layer dropout rate, default is 0
     """
-    self.input_dim = archparams.get('input_dim', (4, 6, 1))
+    self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7))
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.01)
 
     self.conv_units = archparams.get('conv_units', [64, 64, 64])
@@ -114,12 +116,14 @@ class CNNLSTM(BaseModel):
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
                                         padding='same',
+                                        data_format="channels_first",
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
-                                        input_shape=self.input_dim)))
+                                        input_shape=(1, self.input_dim[2], self.input_dim[3]))))
       else:
         model.add(TimeDistributed(Conv2D(self.conv_units[i],
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
+                                        data_format="channels_first",
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
@@ -141,5 +145,6 @@ class CNNLSTM(BaseModel):
                       activation='relu',
                       kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
       model.add(Dropout(self.dense_dropout))
+      model.add(BatchNormalization())
     model.add(Dense(4, activation="softmax"))
     return model
