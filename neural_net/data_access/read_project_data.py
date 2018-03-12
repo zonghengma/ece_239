@@ -23,7 +23,7 @@ class DataReader(object):
                 Each list item is a subject, [A01T_slice, ..., A09T_slice]
   '''
 
-  def __init__(self, path = "project_datasets/", split = True):
+  def __init__(self, path = "project_datasets/", split = False, image = False):
     ''' Accesses the project dataset directory and saves the data.
     '''
     self.dataset_filepath = path
@@ -37,6 +37,8 @@ class DataReader(object):
       y = self.__one_hot_encode(y)
       if split:
         X, y = self.__split(X, y)
+      if image:
+        X = self.__image(X)
       self.raw_data["X" + str(i)] = X
       self.raw_data["y" + str(i)] = y
 
@@ -72,13 +74,25 @@ class DataReader(object):
     return res
 
   def __split(self, X, y): 
-    resX = np.concatenate(np.split(X, 8, axis=2))
-    resY = np.zeros((y.shape[0] * 8, y.shape[1]))
-    for i in range(y.shape[0] * 8):
-      resY[i, :] = y[i % 8, :]
-    return resX, resY
+    #resX = np.concatenate(np.split(X, 8, axis=2))
+    #resY = np.zeros((y.shape[0] * 8, y.shape[1]))
+    #for i in range(y.shape[0] * 8):
+    #  resY[i, :] = y[i % 8, :]
+    #return resX.transpose(0,2,1), resY
+    assert False
         
-
+  def __image(self, X):
+#    img = [[2,3,4,1,5,6],[7,8,9,10,11,12],[14,15,16,17,18,13],[19,20,21,22,0,0]]
+    img = np.array([[0,0,0,1,0,0,0],[0,2,3,4,5,6,0],[7,8,9,10,11,12,13],[0,14,15,16,17,18,0],[0,0,19,20,21,0,0],[0,0,0,22,0,0,0]])
+    res = np.zeros((X.shape[0], X.shape[1], img.shape[0], img.shape[1]))
+    for i in range(X.shape[0]):
+      for j in range(X.shape[1]):
+        for ii in range(img.shape[0]):
+          for jj in range(img.shape[1]):
+            if img[ii,jj] != 0:
+              res[i,j,ii,jj] = X[i, j, img[ii,jj]-1]
+    return res 
+        
   
   def __reservoir_sampling(self, data_length, output_length):
     rate = output_length / data_length
@@ -103,7 +117,7 @@ class DataReader(object):
     y = np.copy(file['type'])
     y = y[0,0:X.shape[0]:1]
     y = np.asarray(y, dtype=np.int32)
-    return X, y
+    return X.transpose(0,2,1)[:,:,:22], y
 
   def __write_file(self, X_tr, y_tr, X_va, y_va, X_te, y_te, file_path):
     if ".npz" not in file_path:
@@ -126,4 +140,5 @@ class DataLoader(object):
     y_val = data["y_val"]
     X_test = data["X_test"]
     y_test = data["y_test"]
-    return (X_train.transpose(0,2,1), y_train, X_val.transpose(0,2,1), y_val, X_test.transpose(0,2,1), y_test) 
+    #return (X_train.transpose(0,2,1), y_train, X_val.transpose(0,2,1), y_val, X_test.transpose(0,2,1), y_test) 
+    return (X_train, y_train, X_val, y_val, X_test, y_test) 
