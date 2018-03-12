@@ -17,7 +17,7 @@ import numpy as np
 #X_test = X_test_raw.reshape(X_test_raw.shape[0], num_pixels).astype('float32')
 #y_main = np_utils.to_categorical(y_main_raw)
 #y_test = np_utils.to_categorical(y_test_raw)
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
+dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
 #num_class = y_test.shape[1]
 #num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
