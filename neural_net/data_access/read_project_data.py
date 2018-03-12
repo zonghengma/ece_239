@@ -84,13 +84,14 @@ class DataReader(object):
   def __image(self, X):
 #    img = [[2,3,4,1,5,6],[7,8,9,10,11,12],[14,15,16,17,18,13],[19,20,21,22,0,0]]
     img = np.array([[0,0,0,1,0,0,0],[0,2,3,4,5,6,0],[7,8,9,10,11,12,13],[0,14,15,16,17,18,0],[0,0,19,20,21,0,0],[0,0,0,22,0,0,0]])
-    res = np.zeros((X.shape[0], X.shape[1], img.shape[0], img.shape[1]))
+    res = np.zeros((X.shape[0], 40, img.shape[0], img.shape[1], 25))
     for i in range(X.shape[0]):
       for j in range(X.shape[1]):
         for ii in range(img.shape[0]):
           for jj in range(img.shape[1]):
             if img[ii,jj] != 0:
-              res[i,j,ii,jj] = X[i, j, img[ii,jj]-1]
+              #for k in range(40):
+              res[i,j//25,ii,jj,j%25] = X[i, j, img[ii,jj]-1]
     return res 
         
   
