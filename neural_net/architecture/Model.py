@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras import regularizers
 from keras.layers import LSTM, Dense, TimeDistributed, Conv2D, Dropout, MaxPooling2D, Flatten
 from keras.layers import BatchNormalization
+import pdb
 
 class StackedLSTM(BaseModel):
   def __init__(self, hyperparams, archparams):
@@ -89,6 +90,8 @@ class CNNLSTM(BaseModel):
       dense_dropout: dense layer dropout rate, default is 0
     """
     self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7))
+    self.channels = archparams.get('channels', 1)
+    self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.channels)
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.01)
 
     self.conv_units = archparams.get('conv_units', [64, 64, 64])
@@ -116,14 +119,13 @@ class CNNLSTM(BaseModel):
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
                                         padding='same',
-                                        data_format="channels_first",
-                                        kernel_regularizer=regularizers.l2(self.kernel_regularizer),
-                                        input_shape=(1, self.input_dim[2], self.input_dim[3]))))
+                                        kernel_regularizer=regularizers.l2(self.kernel_regularizer)),
+                                        input_shape=self.input_shape))
+        pdb.set_trace()
       else:
         model.add(TimeDistributed(Conv2D(self.conv_units[i],
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
-                                        data_format="channels_first",
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
