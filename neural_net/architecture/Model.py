@@ -18,6 +18,8 @@ class StackedLSTM(BaseModel):
                   [32, 32, 32], at least one layer
       dense_units: number of units in each hidden dense layer, default is [1024]
       dense_dropout: dense layer dropout rate, default is 0
+      kernel_regularizer: penalty rate of l2 regularization
+      initializer: initialization
       input_dim: input dimensions, default is 288x1000x25
     """
     self.lstm_act = archparams.get('lstm_activation', 'tanh')
@@ -26,6 +28,7 @@ class StackedLSTM(BaseModel):
     self.dense_units = archparams.get('dense_units', [1024])
     self.dense_dropout = archparams.get('dense_dropout', 0)
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
+    self.initializer = archparams.get('initializer', 'he_normal')
     self.input_dim = archparams.get('input_dim', (288, 1000, 25))
     self.timestep = self.input_dim[1]
     self.channels = self.input_dim[2]
@@ -42,6 +45,7 @@ class StackedLSTM(BaseModel):
                           activation=self.lstm_act,
                           dropout=self.lstm_dropout,
                           kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                          kernel_initializer=self.initializer,
                           input_shape=(self.timestep, self.channels)))
     
     # LSTM layers in the middle
@@ -50,6 +54,7 @@ class StackedLSTM(BaseModel):
                             return_sequences=True,
                             activation=self.lstm_act,
                             kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                            kernel_initializer=self.initializer,
                             dropout=self.lstm_dropout))
     
     # last LSTM layer
@@ -57,16 +62,19 @@ class StackedLSTM(BaseModel):
       model.add(LSTM(self.lstm_units[-1],
                             activation=self.lstm_act,
                             kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                            kernel_initializer=self.initializer,
                             dropout=self.lstm_dropout))
 
     # dense layer for classification
     for i in range(len(self.dense_units)):
       model.add(Dense(self.dense_units[i], 
                       activation='relu',
+                      kernel_initializer=self.initializer,
                       kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
       model.add(Dropout(self.dense_dropout))
       model.add(BatchNormalization())
-    model.add(Dense(4, activation='softmax'))
+    model.add(Dense(4, kernel_initializer=self.initializer, 
+                    activation='softmax'))
     return model
 
 class CNNLSTM(BaseModel):
@@ -76,6 +84,9 @@ class CNNLSTM(BaseModel):
     archparams:
       input_dim: input dimensions(rows, cols, timestep), default is (6, 7, 1)
       kernel_regularizer: penalty rate of l2 regularization
+      channels: channels of the conv layer input
+      initializer: initialization
+
       conv_units: number of units in each conv layer, default is [64, 64, 64]
       conv_activation: convolution activation, default is relu
       kernel_size: size of conv kernel, default is (3, 3)
@@ -93,6 +104,7 @@ class CNNLSTM(BaseModel):
     self.channels = archparams.get('channels', 1)
     self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.channels)
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
+    self.initializer = archparams.get('initializer', 'he_normal')
 
     self.conv_units = archparams.get('conv_units', [128, 128])
     self.conv_act = archparams.get('conv_activation', 'relu')
@@ -119,6 +131,7 @@ class CNNLSTM(BaseModel):
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
                                         padding='same',
+                                        kernel_initializer=self.initializer,
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer)),
                                         input_shape=self.input_shape))
         #pdb.set_trace()
@@ -126,6 +139,7 @@ class CNNLSTM(BaseModel):
         model.add(TimeDistributed(Conv2D(self.conv_units[i],
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
+                                        kernel_initializer=self.initializer,
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       #pdb.set_trace()
@@ -137,17 +151,21 @@ class CNNLSTM(BaseModel):
                     return_sequences=True,
                     activation=self.lstm_act,
                     kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                    kernel_initializer=self.initializer,
                     dropout=self.lstm_dropout))
     model.add(LSTM(self.lstm_units[-1],
                   activation=self.lstm_act,
                   kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                  kernel_initializer=self.initializer,
                   dropout=self.lstm_dropout))
     # add hidden dense layers
     for i in range(len(self.dense_units)):
       model.add(Dense(self.dense_units[i], 
                       activation='relu',
+                      kernel_initializer=self.initializer,
                       kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
       model.add(Dropout(self.dense_dropout))
       model.add(BatchNormalization())
-    model.add(Dense(4, activation="softmax"))
+    model.add(Dense(4, kernel_initializer=self.initializer,
+                    activation="softmax"))
     return model
