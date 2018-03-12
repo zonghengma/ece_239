@@ -17,7 +17,9 @@ import numpy as np
 #X_test = X_test_raw.reshape(X_test_raw.shape[0], num_pixels).astype('float32')
 #y_main = np_utils.to_categorical(y_main_raw)
 #y_test = np_utils.to_categorical(y_test_raw)
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
+dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\sample.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
 #num_class = y_test.shape[1]
 #num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
@@ -41,33 +43,35 @@ archparams = {}
 archparams['input_dim'] = X_train.shape
 archparams['dense_units'] = [1024, 1024]
 archparams['dense_dropout'] = 0.4
-archparams['lstm_dropout'] = 0.4
-archparams['lstm_units'] = [128, 128]
-archparams['kernel_regularizer'] = 0.001
-archparams['conv_units'] = [128, 128]
+#archparams['lstm_dropout'] = 0.4
+#archparams['lstm_units'] = [128, 128]
+#archparams['kernel_regularizer'] = 0.001
+#archparams['conv_units'] = [128, 128]
 print(X_train.shape)
 #archparams['dummy_val'] = 10230
 
 # Set regular hyperparameters.
 hyperparams = {}
 hyperparams['optimizer'] = 'adam'
-hyperparams['learning_rate'] = 1e-3
+#hyperparams['learning_rate'] = 1e-3
+hyperparams['learning_rate'] = 1e-4
 hyperparams['lr_decay'] = 0.001
 hyperparams['loss_function'] = 'categorical_crossentropy'
-hyperparams['batch_size'] = 128
+#hyperparams['batch_size'] = 128
+hyperparams['batch_size'] = 16
 hyperparams['epochs'] = 10
 hyperparams['verbose'] = 2
 
 # Create the network.
 #fc_net = ThreeLayerFcNet(hyperparams, archparams)
 #fc_net.train(data)
-#net = StackedLSTM(hyperparams, archparams)
-#net.train(data)
-cnn = CNNLSTM(hyperparams, archparams)
-cnn.train()
+net = StackedLSTM(hyperparams, archparams)
+net.train(data)
+#cnn = CNNLSTM(hyperparams, archparams)
+#cnn.train()
 
 # Process the data.
 #data_processor = DataProcessor(fc_net)
-data_processor = DataProcessor(cnn)
-#data_processor = DataProcessor(net)
+#data_processor = DataProcessor(cnn)
+data_processor = DataProcessor(net)
 data_processor.save_data_csv(save_history=True)
