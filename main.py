@@ -1,6 +1,6 @@
 from neural_net.data_access.read_project_data import DataReader, DataLoader
 from neural_net.architecture.fc_nets import ThreeLayerFcNet
-from neural_net.architecture.Model import StackedLSTM, CNNLSTM
+from neural_net.architecture.Model import StackedLSTM, CNNLSTM, TemporalCNNLSTM
 from neural_net.data_process.data_processor import DataProcessor
 from keras.datasets import mnist
 from keras.utils import np_utils
@@ -18,7 +18,7 @@ import numpy as np
 #y_main = np_utils.to_categorical(y_main_raw)
 #y_test = np_utils.to_categorical(y_test_raw)
 #<<<<<<< HEAD
-dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
+dl = DataLoader("neural_net/data_access/processed_datasets/all.npz")
 #=======
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\sample.npz")
@@ -27,8 +27,11 @@ dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
 #num_class = y_test.shape[1]
 #num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
-X_train = X_train.reshape(X_train.shape[0],X_train.shape[1], X_train.shape[2], X_train.shape[3], 1)
-X_val = X_val.reshape(X_val.shape[0],X_val.shape[1], X_val.shape[2], X_val.shape[3], 1)
+
+print(X_train.shape)
+print(X_val.shape)
+print(y_train.shape)
+print(y_val.shape)
 #data = {
 #  'X_train': X_main[shuffle_train_idx],
 #  'y_train': y_main[shuffle_train_idx],
@@ -47,8 +50,8 @@ data = {
 archparams = {}
 #archparams['hidden_units'] = [50, 100, 10]
 archparams['input_dim'] = X_train.shape
-archparams['dense_units'] = [1024]
-#archparams['dense_dropout'] = 0.4
+archparams['dense_units'] = [1024, 1024]
+archparams['dense_dropout'] = 0.4
 #archparams['lstm_dropout'] = 0.4
 #archparams['lstm_units'] = [128, 128]
 #archparams['kernel_regularizer'] = 0.001
@@ -59,12 +62,10 @@ print(X_train.shape)
 # Set regular hyperparameters.
 hyperparams = {}
 hyperparams['optimizer'] = 'adam'
-#hyperparams['learning_rate'] = 1e-3
-hyperparams['learning_rate'] = 1e-4
-hyperparams['lr_decay'] = 0.001
+hyperparams['learning_rate'] = 1e-3
+hyperparams['lr_decay'] = 0.01
 hyperparams['loss_function'] = 'categorical_crossentropy'
-#hyperparams['batch_size'] = 128
-hyperparams['batch_size'] = 32
+hyperparams['batch_size'] = 16
 hyperparams['epochs'] = 10
 hyperparams['verbose'] = 2
 
@@ -73,11 +74,11 @@ hyperparams['verbose'] = 2
 #fc_net.train(data)
 #net = StackedLSTM(hyperparams, archparams)
 #net.train(data)
-cnn = CNNLSTM(hyperparams, archparams)
-cnn.train(data)
+cnn1d = TemporalCNNLSTM(hyperparams, archparams)
+cnn1d.train(data)
 
 # Process the data.
 #data_processor = DataProcessor(fc_net)
-data_processor = DataProcessor(cnn)
+data_processor = DataProcessor(cnn1d)
 #data_processor = DataProcessor(net)
 data_processor.save_data_csv(save_history=True)
