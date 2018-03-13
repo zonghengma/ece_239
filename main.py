@@ -27,6 +27,17 @@ data = {
   'y_val': y_val
 }
 
+""" HYPERPARAMS """
+hyperparams = {}
+hyperparams['optimizer'] = 'adam'
+hyperparams['learning_rate'] = 1e-2
+hyperparams['lr_decay'] = 0.001
+hyperparams['loss_function'] = 'categorical_crossentropy'
+hyperparams['batch_size'] = 16
+hyperparams['epochs'] = 100
+hyperparams['verbose'] = 1
+
+
 """ ARCHPARAMS """
 archparams = {}
 ###############
@@ -41,59 +52,50 @@ archparams = {}
 # archparams['initializer'] = 'he_normal'
 # archparams['input_dim'] = X_train.shape
 
+# net = StackedLSTM(hyperparams, archparams)
+# net.train(data)
+
 ###########
 # CNNLSTM #
 ###########
-# archparams['input_dim'] = X_train.shape
-# archparams['channels'] = 1
-# archparams['kernel_regularizer'] = 0.001
-# archparams['initializer'] = 'he_normal'
-# archparams['conv_units'] = [128, 128]
-# archparams['conv_activation'] = 'relu'
-# archparams['kernel_size'] = (2, 2)
-# archparams['pool_size'] = (2, 2)
-# archparams['conv_dropout'] = 0
-# archparams['lstm_units'] = [64, 64]
-# archparams['lstm_activation'] = 'tanh'
-# archparams['lstm_dropout'] = 0
-# archparams['dense_units'] = [1024]
-# archparams['dense_dropout'] = 0
-
-###################
-# TemporalCNNLSTM #
-###################
 archparams['input_dim'] = X_train.shape
+archparams['channels'] = 1
 archparams['kernel_regularizer'] = 0.001
 archparams['initializer'] = 'he_normal'
-archparams['conv_units'] = [64, 64, 128, 128]
+archparams['conv_units'] = [128, 128]
 archparams['conv_activation'] = 'relu'
-archparams['kernel_size'] = 3
-archparams['strides'] = 1
-archparams['pool_size'] = 2
+archparams['kernel_size'] = (2, 2)
+archparams['pool_size'] = (2, 2)
 archparams['conv_dropout'] = 0
-archparams['lstm_units'] = [128, 64]
+archparams['lstm_units'] = [64, 64]
 archparams['lstm_activation'] = 'tanh'
 archparams['lstm_dropout'] = 0
 archparams['dense_units'] = [1024]
 archparams['dense_dropout'] = 0
 
-""" HYPERPARAMS """
-hyperparams = {}
-hyperparams['optimizer'] = 'adam'
-hyperparams['learning_rate'] = 1e-2
-hyperparams['lr_decay'] = 0.001
-hyperparams['loss_function'] = 'categorical_crossentropy'
-hyperparams['batch_size'] = 16
-hyperparams['epochs'] = 100
-hyperparams['verbose'] = 1
-
-# Create the network.
-# net = CNNLSTM(hyperparams, archparams)
-# net.train(data)
-# net = StackedLSTM(hyperparams, archparams)
-# net.train(data)
-net = TemporalCNNLSTM(hyperparams, archparams)
+net = CNNLSTM(hyperparams, archparams)
 net.train(data)
+
+###################
+# TemporalCNNLSTM #
+###################
+# archparams['input_dim'] = X_train.shape
+# archparams['kernel_regularizer'] = 0.001
+# archparams['initializer'] = 'he_normal'
+# archparams['conv_units'] = [64, 64, 128, 128]
+# archparams['conv_activation'] = 'relu'
+# archparams['kernel_size'] = 3
+# archparams['strides'] = 1
+# archparams['pool_size'] = 2
+# archparams['conv_dropout'] = 0
+# archparams['lstm_units'] = [128, 64]
+# archparams['lstm_activation'] = 'tanh'
+# archparams['lstm_dropout'] = 0
+# archparams['dense_units'] = [1024]
+# archparams['dense_dropout'] = 0
+
+# net = TemporalCNNLSTM(hyperparams, archparams)
+# net.train(data)
 
 # Process the data.
 data_processor = DataProcessor(net)
