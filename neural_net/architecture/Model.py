@@ -4,6 +4,7 @@ from keras.models import Sequential
 from keras import regularizers
 from keras.layers import LSTM, Dense, TimeDistributed, Conv2D, Dropout, MaxPooling2D, Flatten
 from keras.layers import Conv1D, MaxPooling1D
+from keras.layers import Conv3D, MaxPooling3D
 from keras.layers import BatchNormalization
 import pdb
 
@@ -101,7 +102,7 @@ class CNNLSTM(BaseModel):
       dense_units: number of units in each hidden dense layer, default is [1024]
       dense_dropout: dense layer dropout rate, default is 0
     """
-    self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7))
+    self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7, 1))
     self.channels = archparams.get('channels', 1)
     self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.channels)
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
@@ -113,7 +114,7 @@ class CNNLSTM(BaseModel):
     self.pool_size = archparams.get('pool_size', (2, 2))
     self.conv_dropout = archparams.get('conv_dropout', 0)
 
-    self.lstm_units = archparams.get('lstm_units', [128, 64])
+    self.lstm_units = archparams.get('lstm_units', [64, 64])
     self.lstm_act = archparams.get('lstm_activation', 'tanh')
     self.lstm_dropout = archparams.get('lstm_dropout', 0)
 
@@ -215,7 +216,7 @@ class TemporalCNNLSTM(BaseModel):
     self.dense_dropout = archparams.get('dense_dropout', 0)
 
     model = self.construct_model()
-    super().__init__(model, 'CNNLSTM', hyperparams, archparams)
+    super().__init__(model, 'TemporalCNNLSTM', hyperparams, archparams)
 
   def construct_model(self):
     model = Sequential()
@@ -265,6 +266,131 @@ class TemporalCNNLSTM(BaseModel):
       model.add(Dropout(self.dense_dropout))
       model.add(BatchNormalization())
     #model.add(Flatten())
+    model.add(Dense(4, kernel_initializer=self.initializer,
+                    activation="softmax"))
+    pdb.set_trace()
+    return model
+
+class vanilaCNN2D(BaseModel):
+  def __init__(self, hyperparams, archparams):
+    """
+    architecture: [[Conv2D-Conv2D]-maxpooling]xN - [Dense]xM
+    """
+    self.input_dim = archparams.get('input_dim', (288*40, 6, 7, 25))
+    self.channels = archparams.get('channels', 25)
+    self.input_shape = (self.input_dim[1], self.input_dim[2], self.channels)
+    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
+    self.initializer = archparams.get('initializer', 'he_normal')
+
+    self.conv_units = archparams.get('conv_units', [64, 64, 128, 128])
+    self.conv_act = archparams.get('conv_activation', 'relu')
+    self.kernel_size = archparams.get('kernel_size', (2,2))
+    self.strides = archparams.get('strides', (1,1))
+    self.pool_size = archparams.get('pool_size', (2,2))
+    self.conv_dropout = archparams.get('conv_dropout', 0)
+
+    self.dense_units = archparams.get('dense_units', [1024])
+    self.dense_dropout = archparams.get('dense_dropout', 0)
+
+    model = self.construct_model()
+    super().__init__(model, 'vanilaCNN2D', hyperparams, archparams)
+
+  def construct_model(self):
+    model = Sequential()
+    # define CNN model
+    for i in range(len(self.conv_units)):
+      if i == 0:
+        model.add(Conv2D(self.conv_units[i],
+                        kernel_size=self.kernel_size,
+                        activation=self.conv_act,
+                        padding='same',
+                        strides=self.strides,
+                        kernel_initializer=self.initializer,
+                        kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                        input_shape=self.input_shape))
+        #pdb.set_trace()
+      else:
+        model.add(Conv2D(self.conv_units[i],
+                        kernel_size=self.kernel_size,
+                        activation=self.conv_act,
+                        padding='same',
+                        strides=self.strides,
+                        kernel_initializer=self.initializer,
+                        kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
+      #pdb.set_trace()
+      if (i+1)%2 == 0: 
+        model.add(MaxPooling2D(pool_size=self.pool_size))
+
+    for i in range(len(self.dense_units)):
+      model.add(Dense(self.dense_units[i], 
+                      activation='relu',
+                      kernel_initializer=self.initializer,
+                      kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
+      model.add(Dropout(self.dense_dropout))
+      model.add(BatchNormalization())
+    model.add(Flatten())
+    model.add(Dense(4, kernel_initializer=self.initializer,
+                    activation="softmax"))
+    pdb.set_trace()
+    return model
+
+class vanilaCNN3D(BaseModel):
+  def __init__(self, hyperparams, archparams):
+    """
+    architecture: [[Conv3D-Conv3D]-maxpooling]xN - [Dense]xM
+    """
+    self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7, 1))
+    self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.input_dim[4])
+    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
+    self.initializer = archparams.get('initializer', 'he_normal')
+
+    self.conv_units = archparams.get('conv_units', [64, 64, 128, 128])
+    self.conv_act = archparams.get('conv_activation', 'relu')
+    self.kernel_size = archparams.get('kernel_size', (2,2,2))
+    self.strides = archparams.get('strides', (1,1,1))
+    self.pool_size = archparams.get('pool_size', (2,1,1))
+    self.conv_dropout = archparams.get('conv_dropout', 0)
+
+    self.dense_units = archparams.get('dense_units', [1024])
+    self.dense_dropout = archparams.get('dense_dropout', 0)
+
+    model = self.construct_model()
+    super().__init__(model, 'vanilaCNN3D', hyperparams, archparams)
+
+  def construct_model(self):
+    model = Sequential()
+    # define CNN model
+    for i in range(len(self.conv_units)):
+      if i == 0:
+        model.add(Conv3D(self.conv_units[i],
+                        kernel_size=self.kernel_size,
+                        activation=self.conv_act,
+                        padding='same',
+                        strides=self.strides,
+                        kernel_initializer=self.initializer,
+                        kernel_regularizer=regularizers.l2(self.kernel_regularizer),
+                        input_shape=self.input_shape))
+        #pdb.set_trace()
+      else:
+        model.add(Conv3D(self.conv_units[i],
+                        kernel_size=self.kernel_size,
+                        activation=self.conv_act,
+                        padding='same',
+                        strides=self.strides,
+                        kernel_initializer=self.initializer,
+                        kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
+      #pdb.set_trace()
+      if (i+1)%2 == 0: 
+        model.add(MaxPooling3D(pool_size=self.pool_size))
+
+    for i in range(len(self.dense_units)):
+      model.add(Dense(self.dense_units[i], 
+                      activation='relu',
+                      kernel_initializer=self.initializer,
+                      kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
+      model.add(Dropout(self.dense_dropout))
+      model.add(BatchNormalization())
+    model.add(Flatten())
     model.add(Dense(4, kernel_initializer=self.initializer,
                     activation="softmax"))
     pdb.set_trace()
