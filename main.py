@@ -8,9 +8,9 @@ import numpy as np
 
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_all.npz")
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1.npz")
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1-8.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1-8.npz")
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_all.npz")
-# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj1.npz")
+dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj1.npz")
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj2.npz")
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj1-8.npz")
 
@@ -27,31 +27,57 @@ data = {
   'y_val': y_val
 }
 
-
-# Set architecture-specific parameters.
+""" ARCHPARAMS """
 archparams = {}
-archparams['input_dim'] = X_train.shape
-archparams['channels'] = 3
-
-archparams['kernel_regularizer'] = 0.001
-archparams['conv_units'] = [32, 32]
-archparams['kernel_size'] = (3, 3)
-archparams['pool_size'] = (1, 1)
-
-archparams['lstm_units'] = [8, 8, 8, 8, 8]
-
-archparams['dense_units'] = [1024, 512]
-archparams['dense_dropout'] = 0.4
-
-# archparams['input_dim'] = X_train.shape
+###############
+# StackedLSTM #
+###############
 # archparams['lstm_activation'] = 'tanh'
-# archparams['lstm_dropout'] = 0.4
+# archparams['lstm_dropout'] = 0
 # archparams['lstm_units'] = [32, 32, 32]
-# archparams['dense_units'] = [1024, 512]
-# archparams['dense_dropout'] = 0.4
+# archparams['dense_units'] = [1024]
+# archparams['dense_dropout'] = 0
 # archparams['kernel_regularizer'] = 0.001
+# archparams['initializer'] = 'he_normal'
+# archparams['input_dim'] = X_train.shape
 
-# Set regular hyperparameters.
+###########
+# CNNLSTM #
+###########
+# archparams['input_dim'] = X_train.shape
+# archparams['channels'] = 1
+# archparams['kernel_regularizer'] = 0.001
+# archparams['initializer'] = 'he_normal'
+# archparams['conv_units'] = [128, 128]
+# archparams['conv_activation'] = 'relu'
+# archparams['kernel_size'] = (2, 2)
+# archparams['pool_size'] = (2, 2)
+# archparams['conv_dropout'] = 0
+# archparams['lstm_units'] = [64, 64]
+# archparams['lstm_activation'] = 'tanh'
+# archparams['lstm_dropout'] = 0
+# archparams['dense_units'] = [1024]
+# archparams['dense_dropout'] = 0
+
+###################
+# TemporalCNNLSTM #
+###################
+archparams['input_dim'] = X_train.shape
+archparams['kernel_regularizer'] = 0.001
+archparams['initializer'] = 'he_normal'
+archparams['conv_units'] = [64, 64, 128, 128]
+archparams['conv_activation'] = 'relu'
+archparams['kernel_size'] = 3
+archparams['strides'] = 1
+archparams['pool_size'] = 2
+archparams['conv_dropout'] = 0
+archparams['lstm_units'] = [128, 64]
+archparams['lstm_activation'] = 'tanh'
+archparams['lstm_dropout'] = 0
+archparams['dense_units'] = [1024]
+archparams['dense_dropout'] = 0
+
+""" HYPERPARAMS """
 hyperparams = {}
 hyperparams['optimizer'] = 'adam'
 hyperparams['learning_rate'] = 1e-2
@@ -62,12 +88,12 @@ hyperparams['epochs'] = 100
 hyperparams['verbose'] = 1
 
 # Create the network.
-net = CNNLSTM(hyperparams, archparams)
-net.train(data)
+# net = CNNLSTM(hyperparams, archparams)
+# net.train(data)
 # net = StackedLSTM(hyperparams, archparams)
 # net.train(data)
-# net = TemporalCNNLSTM(hyperparams, archparams)
-# net.train(data)
+net = TemporalCNNLSTM(hyperparams, archparams)
+net.train(data)
 
 # Process the data.
 data_processor = DataProcessor(net)
