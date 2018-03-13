@@ -268,7 +268,7 @@ class TemporalCNNLSTM(BaseModel):
     #model.add(Flatten())
     model.add(Dense(4, kernel_initializer=self.initializer,
                     activation="softmax"))
-    pdb.set_trace()
+    # pdb.set_trace()
     return model
 
 class vanilaCNN2D(BaseModel):

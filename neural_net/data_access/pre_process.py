@@ -16,6 +16,6 @@ if __name__ == "__main__":
     of_path = sys.argv[4]  	
   else:
     of_path = os.path.join("processed_datasets", "processed_data.npz")
-  dr = DataReader(if_path, False, False, True)
+  dr = DataReader(if_path, False, False, False)
   dr.preprocess(train_subjects, test_subjects, of_path)
   

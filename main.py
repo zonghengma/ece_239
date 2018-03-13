@@ -6,45 +6,20 @@ from keras.datasets import mnist
 from keras.utils import np_utils
 import numpy as np
 
-# Get mnist data.
-#(X_main_raw, y_main_raw), (X_test_raw, y_test_raw) = mnist.load_data()
-#shuffle_train_idx = np.random.permutation(X_main_raw.shape[0])
-#shuffle_val_idx = np.random.permutation(X_test_raw.shape[0])
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_all.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1.npz")
+dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1-8.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_all.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj1.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj2.npz")
+# dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_subj1-8.npz")
 
-# Reshape the data into proper format.
-#num_pixels = X_main_raw.shape[1] * X_main_raw.shape[2]
-#X_main = X_main_raw.reshape(X_main_raw.shape[0], num_pixels).astype('float32')
-#X_test = X_test_raw.reshape(X_test_raw.shape[0], num_pixels).astype('float32')
-#y_main = np_utils.to_categorical(y_main_raw)
-#y_test = np_utils.to_categorical(y_test_raw)
-#<<<<<<< HEAD
-#<<<<<<< HEAD
-#dl = DataLoader("neural_net/data_access/processed_datasets/img_sample.npz")
-#=======
-#dl = DataLoader("neural_net/data_access/processed_datasets/all.npz")
-#>>>>>>> 08846889b0d4db97f3d10084b39341f33e685363
-#=======
-#dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
-#dl = DataLoader("neural_net\\data_access\\processed_datasets\\sample.npz")
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
-#dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_split_sample2.npz")
-#dl = DataLoader("neural_net\\data_access\\processed_datasets\\augment_sample.npz")
-#dl = DataLoader("neural_net\\data_access\\processed_datasets\\no_cue_sample.npz")
-#>>>>>>> 02f24cb2aa27da9dffc2fc13176bfd0c1a7da21f
-#num_class = y_test.shape[1]
-#num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
 
 print(X_train.shape)
 print(X_val.shape)
 print(y_train.shape)
 print(y_val.shape)
-#data = {
-#  'X_train': X_main[shuffle_train_idx],
-#  'y_train': y_main[shuffle_train_idx],
-#  'X_val': X_main[shuffle_val_idx],
-#  'y_val': y_main[shuffle_val_idx]
-#}
 data = {
   'X_train': X_train,
   'y_train': y_train,
@@ -55,61 +30,45 @@ data = {
 
 # Set architecture-specific parameters.
 archparams = {}
-archparams['hidden_units'] = [50, 100, 10]
 archparams['input_dim'] = X_train.shape
-#<<<<<<< HEAD
-#<<<<<<< HEAD
-#archparams['dense_units'] = [1024, 1024]
-archparams['dense_units'] = [512]
-#archparams['dense_dropout'] = 0.1
-archparams['channels'] = 1
-#archparams['channels'] = 40
-#=======
-#archparams['dense_units'] = [1024]
-#archparams['dense_dropout'] = 0.4
-#>>>>>>> 568e201b1e6e03305ac2517b48ecc3c84b5a4edc
-#=======
-#archparams['dense_units'] = [1024, 1024]
-#archparams['dense_dropout'] = 0.4
-#>>>>>>> 08846889b0d4db97f3d10084b39341f33e685363
-#archparams['lstm_dropout'] = 0.4
-archparams['lstm_units'] = [128, 128, 128]
-#archparams['kernel_regularizer'] = 0.001
-archparams['kernel_size'] = (2,2)
-archparams['conv_units'] = [128, 128]
-print(X_train.shape)
-#archparams['dummy_val'] = 10230
+archparams['channels'] = 3
+
+archparams['kernel_regularizer'] = 0.001
+archparams['conv_units'] = [32, 32]
+archparams['kernel_size'] = (3, 3)
+archparams['pool_size'] = (1, 1)
+
+archparams['lstm_units'] = [8, 8, 8, 8, 8]
+
+archparams['dense_units'] = [1024, 512]
+archparams['dense_dropout'] = 0.4
+
+# archparams['input_dim'] = X_train.shape
+# archparams['lstm_activation'] = 'tanh'
+# archparams['lstm_dropout'] = 0.4
+# archparams['lstm_units'] = [32, 32, 32]
+# archparams['dense_units'] = [1024, 512]
+# archparams['dense_dropout'] = 0.4
+# archparams['kernel_regularizer'] = 0.001
 
 # Set regular hyperparameters.
 hyperparams = {}
 hyperparams['optimizer'] = 'adam'
-hyperparams['learning_rate'] = 1e-3
-#<<<<<<< HEAD
-#hyperparams['learning_rate'] = 1e-4
-#hyperparams['learning_rate'] = 3e-5
-#hyperparams['lr_decay'] = 0.001
-#hyperparams['loss_function'] = 'categorical_crossentropy'
-#hyperparams['batch_size'] = 128
-##hyperparams['batch_size'] = 32
-#hyperparams['epochs'] = 30
-#=======
-hyperparams['lr_decay'] = 0.01
+hyperparams['learning_rate'] = 1e-2
+hyperparams['lr_decay'] = 0.001
 hyperparams['loss_function'] = 'categorical_crossentropy'
 hyperparams['batch_size'] = 16
-hyperparams['epochs'] = 10
-#>>>>>>> 08846889b0d4db97f3d10084b39341f33e685363
-hyperparams['verbose'] = 2
+hyperparams['epochs'] = 100
+hyperparams['verbose'] = 1
 
 # Create the network.
-#fc_net = ThreeLayerFcNet(hyperparams, archparams)
-#fc_net.train(data)
-#net = StackedLSTM(hyperparams, archparams)
-#net.train(data)
-cnn1d = TemporalCNNLSTM(hyperparams, archparams)
-cnn1d.train(data)
+net = CNNLSTM(hyperparams, archparams)
+net.train(data)
+# net = StackedLSTM(hyperparams, archparams)
+# net.train(data)
+# net = TemporalCNNLSTM(hyperparams, archparams)
+# net.train(data)
 
 # Process the data.
-#data_processor = DataProcessor(fc_net)
-data_processor = DataProcessor(cnn1d)
-#data_processor = DataProcessor(net)
+data_processor = DataProcessor(net)
 data_processor.save_data_csv(save_history=True)

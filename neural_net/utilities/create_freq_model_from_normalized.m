@@ -4,7 +4,7 @@ clear all;
 
 %% load the raw data
 
-items = ['..\..\project_datasets\normalize_by_trial_and_channel\A01T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A02T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A03T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A04T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A05T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A06T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A07T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A08T_slice.mat';'..\..\project_datasets\normalize_by_trial_and_channel\A09T_slice.mat'];
+items = ['..\..\project_datasets\nan_winsor_normalized\A01T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A02T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A03T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A04T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A05T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A06T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A07T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A08T_slice.mat';'..\..\project_datasets\nan_winsor_normalized\A09T_slice.mat'];
 
 for i = 1 : 9
     data(i) = load(items(i,:));
@@ -75,19 +75,19 @@ end
 
 %% double check
 
-squeeze(data_reshaped(1).image(1, 1, :, :, 1))
-
-Fs = 250;
-L = 125;
-T = 1 / Fs;
-
-Y = fft(data(1).image(1:125,1,1));
-
-P2 = abs(Y/L);
-P1 = P2(1:floor(L/2)+1);
-P1(2:end-1) = 2*P1(2:end-1);
-
-f = Fs*(0:floor(L/2))/L;
+% % squeeze(data_reshaped(1).image(1, 1, :, :, 1))
+% 
+% Fs = 250;
+% L = 125;
+% T = 1 / Fs;
+% 
+% Y = fft(data(1).image(1:125,1,1));
+% 
+% P2 = abs(Y/L);
+% P1 = P2(1:floor(L/2)+1);
+% P1(2:end-1) = 2*P1(2:end-1);
+% 
+% f = Fs*(0:floor(L/2))/L;
 % plot(f, P1)
 
 
