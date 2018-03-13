@@ -23,13 +23,15 @@ class DataReader(object):
                 Each list item is a subject, [A01T_slice, ..., A09T_slice]
   '''
 
-  def __init__(self, path = "project_datasets/", split = False, image = False):
+  def __init__(self, path = "project_datasets/", split = False, image = False, freq = False):
     ''' Accesses the project dataset directory and saves the data.
     '''
     self.dataset_filepath = path
     self.raw_data = dict()
 
     self.split = split
+    self.freq = freq
+    self.image = image
 
     for i in range(1, 10):
       file_name = "A0" + str(i) + "T_slice.mat"
@@ -132,11 +134,13 @@ class DataReader(object):
     y = np.copy(file['type'])
     y = y[0,0:X.shape[0]:1]
     y = np.asarray(y, dtype=np.int32)
-    if not self.split:
+    if self.split:
+      return X[:,:22,:], y
+    elif self.freq:
+      return X, y
+    else:
       #return X.transpose(0,2,1)[:,250:,:22], y
       return X.transpose(0,2,1)[:,:,:22], y
-    else:
-      return X[:,:22,:], y
 
   def __write_file(self, X_tr, y_tr, X_va, y_va, X_te, y_te, file_path):
     if ".npz" not in file_path:
