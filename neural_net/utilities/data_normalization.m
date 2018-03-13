@@ -18,7 +18,7 @@ end
 %% normalize by each channel by each trial
 
 items = ['..\..\project_datasets\nan_removed_by_trial\A01T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A02T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A03T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A04T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A05T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A06T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A07T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A08T_slice.mat';'..\..\project_datasets\nan_removed_by_trial\A09T_slice.mat'];
-
+winsor_thresh = [10, 90];
 for a = 1 : 9
     subject = load(items(a,:));
     num_channels = size(subject.image, 2);
@@ -30,6 +30,7 @@ for a = 1 : 9
             trial = trial - mean(trial);
             trial = trial / std(trial);
             subject.image(:,j,k) = trial;
+            subject.image(:,j,k) = winsor(subject.image(:,j,k), winsor_thresh);
         end
     end
     
