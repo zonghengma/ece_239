@@ -73,6 +73,25 @@ for a = 1 : 9
     data_out(a).image = current_fft;
 end
 
+%% double check
+
+squeeze(data_reshaped(1).image(1, 1, :, :, 1))
+
+Fs = 250;
+L = 125;
+T = 1 / Fs;
+
+Y = fft(data(1).image(1:125,1,1));
+
+P2 = abs(Y/L);
+P1 = P2(1:floor(L/2)+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:floor(L/2))/L;
+% plot(f, P1)
+
+
+
 %% reshaper
 
 img = [0,0,0,1,0,0,0 ; 0,2,3,4,5,6,0 ; 7,8,9,10,11,12,13 ; 0,14,15,16,17,18,0 ; 0,0,19,20,21,0,0 ; 0,0,0,22,0,0,0];
@@ -96,7 +115,7 @@ end
 for a = 1: 9
     filename = strcat('output\A0', sprintf('%i', a), 'T_slice.mat');
     % mismatched because labels never change
-    image = data_reshaped(a).image;
+    image = permute(data_reshaped(a).image, [5, 4, 3, 2, 1]);
     type = data(a).type;
     save(filename, 'image', 'type', '-v7.3');
 end
