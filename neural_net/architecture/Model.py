@@ -25,7 +25,7 @@ class StackedLSTM(BaseModel):
     self.lstm_units = archparams.get('lstm_units', [32, 32, 32])
     self.dense_units = archparams.get('dense_units', [1024])
     self.dense_dropout = archparams.get('dense_dropout', 0)
-    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.01)
+    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
     self.input_dim = archparams.get('input_dim', (288, 1000, 25))
     self.timestep = self.input_dim[1]
     self.channels = self.input_dim[2]
@@ -92,15 +92,15 @@ class CNNLSTM(BaseModel):
     self.input_dim = archparams.get('input_dim', (288, 1000, 6, 7))
     self.channels = archparams.get('channels', 1)
     self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.channels)
-    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.01)
+    self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
 
-    self.conv_units = archparams.get('conv_units', [64, 64, 64])
+    self.conv_units = archparams.get('conv_units', [128, 128])
     self.conv_act = archparams.get('conv_activation', 'relu')
-    self.kernel_size = archparams.get('kernel_size', (3, 3))
+    self.kernel_size = archparams.get('kernel_size', (2, 2))
     self.pool_size = archparams.get('pool_size', (2, 2))
     self.conv_dropout = archparams.get('conv_dropout', 0)
 
-    self.lstm_units = archparams.get('lstm_units', [32, 32, 32])
+    self.lstm_units = archparams.get('lstm_units', [128, 64])
     self.lstm_act = archparams.get('lstm_activation', 'tanh')
     self.lstm_dropout = archparams.get('lstm_dropout', 0)
 
@@ -129,7 +129,7 @@ class CNNLSTM(BaseModel):
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       #pdb.set_trace()
-      #model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
+    model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
     model.add(TimeDistributed(Flatten()))
     # define LSTM model
     for i in range(len(self.lstm_units)-1):

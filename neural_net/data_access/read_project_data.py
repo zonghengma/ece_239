@@ -29,6 +29,8 @@ class DataReader(object):
     self.dataset_filepath = path
     self.raw_data = dict()
 
+    self.split = split
+
     for i in range(1, 10):
       file_name = "A0" + str(i) + "T_slice.mat"
       file_path = os.path.join(self.dataset_filepath, file_name)
@@ -55,10 +57,22 @@ class DataReader(object):
       X_train_val = X_all[train_val_index]
       y_train_val = y_all[train_val_index]
     else:
+      print("not dif")
       X_train_val = np.concatenate([self.raw_data["X" + str(i)] for i in train_subjects])
       y_train_val = np.concatenate([self.raw_data["y" + str(i)] for i in train_subjects])
       X_test = np.concatenate([self.raw_data["X" + str(i)] for i in test_subjects])
       y_test = np.concatenate([self.raw_data["y" + str(i)] for i in test_subjects])
+
+      #X_train = np.concatenate([self.raw_data["X" + str(i)] for i in train_subjects])
+      #y_train = np.concatenate([self.raw_data["y" + str(i)] for i in train_subjects])
+
+      #X_val = np.concatenate([self.raw_data["X" + str(i)] for i in test_subjects])
+      #y_val = np.concatenate([self.raw_data["y" + str(i)] for i in test_subjects])
+
+      #X_test = np.concatenate([self.raw_data["X" + str(i)] for i in test_subjects])
+      #y_test = np.concatenate([self.raw_data["y" + str(i)] for i in test_subjects])
+      
+      
 
     val_index, train_index = self.__reservoir_sampling(X_train_val.shape[0], int(X_train_val.shape[0] * 0.1))
     X_val = X_train_val[val_index]
@@ -74,24 +88,24 @@ class DataReader(object):
     return res
 
   def __split(self, X, y): 
-    #resX = np.concatenate(np.split(X, 8, axis=2))
-    #resY = np.zeros((y.shape[0] * 8, y.shape[1]))
-    #for i in range(y.shape[0] * 8):
-    #  resY[i, :] = y[i % 8, :]
-    #return resX.transpose(0,2,1), resY
-    assert False
+    resX = np.concatenate(np.split(X, 8, axis=2))
+    resY = np.zeros((y.shape[0] * 8, y.shape[1]))
+    for i in range(y.shape[0] * 8):
+      resY[i, :] = y[i % 8, :]
+    return resX.transpose(0,2,1), resY
+    #assert False
         
   def __image(self, X):
 #    img = [[2,3,4,1,5,6],[7,8,9,10,11,12],[14,15,16,17,18,13],[19,20,21,22,0,0]]
     img = np.array([[0,0,0,1,0,0,0],[0,2,3,4,5,6,0],[7,8,9,10,11,12,13],[0,14,15,16,17,18,0],[0,0,19,20,21,0,0],[0,0,0,22,0,0,0]])
-    res = np.zeros((X.shape[0], 40, img.shape[0], img.shape[1], 25))
+    res = np.zeros((X.shape[0], 25, img.shape[0], img.shape[1], 40))
     for i in range(X.shape[0]):
       for j in range(X.shape[1]):
         for ii in range(img.shape[0]):
           for jj in range(img.shape[1]):
             if img[ii,jj] != 0:
               #for k in range(40):
-              res[i,j//25,ii,jj,j%25] = X[i, j, img[ii,jj]-1]
+              res[i,j%25,ii,jj,j//25] = X[i, j, img[ii,jj]-1]
     return res 
         
   
@@ -118,7 +132,11 @@ class DataReader(object):
     y = np.copy(file['type'])
     y = y[0,0:X.shape[0]:1]
     y = np.asarray(y, dtype=np.int32)
-    return X.transpose(0,2,1)[:,:,:22], y
+    if not self.split:
+      #return X.transpose(0,2,1)[:,250:,:22], y
+      return X.transpose(0,2,1)[:,:,:22], y
+    else:
+      return X[:,:22,:], y
 
   def __write_file(self, X_tr, y_tr, X_va, y_va, X_te, y_te, file_path):
     if ".npz" not in file_path:

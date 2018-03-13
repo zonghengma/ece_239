@@ -22,13 +22,16 @@ import numpy as np
 #=======
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\norm_sample.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\sample.npz")
-dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_split_sample.npz")
+dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_sample.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\img_split_sample2.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\augment_sample.npz")
+#dl = DataLoader("neural_net\\data_access\\processed_datasets\\no_cue_sample.npz")
 #>>>>>>> 02f24cb2aa27da9dffc2fc13176bfd0c1a7da21f
 #num_class = y_test.shape[1]
 #num_class = y_test.shape[1]
 X_train, y_train, X_val, y_val, X_test, y_test = dl.load()
-#X_train = X_train.reshape(X_train.shape[0],X_train.shape[1], X_train.shape[2], X_train.shape[3], 1)
-#X_val = X_val.reshape(X_val.shape[0],X_val.shape[1], X_val.shape[2], X_val.shape[3], 1)
+X_train = X_train.reshape(X_train.shape[0],X_train.shape[1], X_train.shape[2], X_train.shape[3], 1)
+X_val = X_val.reshape(X_val.shape[0],X_val.shape[1], X_val.shape[2], X_val.shape[3], 1)
 #data = {
 #  'X_train': X_main[shuffle_train_idx],
 #  'y_train': y_main[shuffle_train_idx],
@@ -45,14 +48,20 @@ data = {
 
 # Set architecture-specific parameters.
 archparams = {}
-#archparams['hidden_units'] = [50, 100, 10]
+archparams['hidden_units'] = [50, 100, 10]
 archparams['input_dim'] = X_train.shape
+#<<<<<<< HEAD
 #archparams['dense_units'] = [1024, 1024]
-archparams['dense_units'] = [1024]
+archparams['dense_units'] = [512]
+#archparams['dense_dropout'] = 0.1
+archparams['channels'] = 1
+#archparams['channels'] = 40
+#=======
+#archparams['dense_units'] = [1024]
 #archparams['dense_dropout'] = 0.4
-archparams['channels'] = 25
+#>>>>>>> 568e201b1e6e03305ac2517b48ecc3c84b5a4edc
 #archparams['lstm_dropout'] = 0.4
-archparams['lstm_units'] = [128, 128]
+archparams['lstm_units'] = [128, 128, 128]
 #archparams['kernel_regularizer'] = 0.001
 archparams['kernel_size'] = (2,2)
 archparams['conv_units'] = [128, 128]
@@ -62,13 +71,14 @@ print(X_train.shape)
 # Set regular hyperparameters.
 hyperparams = {}
 hyperparams['optimizer'] = 'adam'
-#hyperparams['learning_rate'] = 1e-3
-hyperparams['learning_rate'] = 1e-4
+hyperparams['learning_rate'] = 1e-3
+#hyperparams['learning_rate'] = 1e-4
+#hyperparams['learning_rate'] = 3e-5
 hyperparams['lr_decay'] = 0.001
 hyperparams['loss_function'] = 'categorical_crossentropy'
-#hyperparams['batch_size'] = 128
-hyperparams['batch_size'] = 16
-hyperparams['epochs'] = 10
+hyperparams['batch_size'] = 128
+#hyperparams['batch_size'] = 32
+hyperparams['epochs'] = 30
 hyperparams['verbose'] = 2
 
 # Create the network.
