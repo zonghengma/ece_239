@@ -138,6 +138,11 @@ class BaseModel(object):
       beta_2 = hyperparams['beta2'] if 'beta2' in hyperparams else 0.999
       return optimizers.Adam(lr=learning_rate, beta_1=beta_1, beta_2=beta_2,
                              decay=lr_decay)
+    elif optimizer == 'sgd':
+      # Load parameters for this optimizer, but provide default values too.
+      momentum = hyperparams['momentum'] if 'momentum' in hyperparams else 0.9
+      nesterov = hyperparams['nesterov'] if 'nesterov' in hyperparams else True
+      return optimizers.SGD(lr=learning_rate, momentum=momentum, nesterov=nesterov, decay=lr_decay)
     else:
       raise Error('Optimizer: ' + optimizer + ' has not been implemented ' +
                   'yet in base_model.py. Implement it in __create_optimizer ' +
