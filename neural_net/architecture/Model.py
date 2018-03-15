@@ -93,7 +93,9 @@ class CNNLSTM(BaseModel):
       conv_activation: convolution activation, default is relu
       kernel_size: size of conv kernel, default is (3, 3)
       pool_size: size of pooling layer, default is (2, 2)
+      pool_strides: size of strides in pooling layer, default is (1, 1)
       conv_dropout: convolution layer dropout rate, ranges from [0, 1], default no dropout
+        should be a length-N array, where N is number of conv layers
 
       lstm_units: number of units in each lstm layer, default is [32, 32, 32]
       lstm_activation: lstm activation, default is tanh
@@ -106,13 +108,15 @@ class CNNLSTM(BaseModel):
     self.channels = archparams.get('channels', 1)
     self.input_shape = (self.input_dim[1], self.input_dim[2], self.input_dim[3], self.channels)
     self.kernel_regularizer = archparams.get('kernel_regularizer', 0.001)
-    self.initializer = archparams.get('initializer', 'he_normal')
+    self.initializer = archparams.get('initializer', None)
 
     self.conv_units = archparams.get('conv_units', [128, 128])
     self.conv_act = archparams.get('conv_activation', 'relu')
     self.kernel_size = archparams.get('kernel_size', (2, 2))
-    self.pool_size = archparams.get('pool_size', (2, 2))
-    self.conv_dropout = archparams.get('conv_dropout', 0)
+    self.pool_size = archparams.get('pool_size', [(1,1), (1,1)])
+    self.pool_strides = archparams.get('pool_strides', [None, None])
+    self.dilation_rate = archparams.get('dilation_rate', (1, 1))
+    self.conv_dropout = archparams.get('conv_dropout', [0, 0])
 
     self.lstm_units = archparams.get('lstm_units', [64, 64])
     self.lstm_act = archparams.get('lstm_activation', 'tanh')
@@ -133,6 +137,7 @@ class CNNLSTM(BaseModel):
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
                                         padding='same',
+                                        dilation_rate=self.dilation_rate,
                                         kernel_initializer=self.initializer,
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer)),
                                         input_shape=self.input_shape))
@@ -141,11 +146,14 @@ class CNNLSTM(BaseModel):
         model.add(TimeDistributed(Conv2D(self.conv_units[i],
                                         kernel_size=self.kernel_size,
                                         activation=self.conv_act,
+                                        dilation_rate=self.dilation_rate,
                                         kernel_initializer=self.initializer,
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       #pdb.set_trace()
-    model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size)))
+      model.add(Dropout(self.conv_dropout[i]))
+      model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size[i], strides=self.pool_strides[i])))
+      #model.add(BatchNormalization())
     model.add(TimeDistributed(Flatten()))
     # define LSTM model
     for i in range(len(self.lstm_units)-1):
@@ -170,6 +178,7 @@ class CNNLSTM(BaseModel):
       model.add(BatchNormalization())
     model.add(Dense(4, kernel_initializer=self.initializer,
                     activation="softmax"))
+    model.summary()
     return model
 
 class TemporalCNNLSTM(BaseModel):
@@ -206,6 +215,7 @@ class TemporalCNNLSTM(BaseModel):
     self.kernel_size = archparams.get('kernel_size', 3)
     self.strides = archparams.get('strides', 1)
     self.pool_size = archparams.get('pool_size', 2)
+    self.dilation_rate = archparams.get('dilation_rate', 1)
     self.conv_dropout = archparams.get('conv_dropout', 0)
 
     self.lstm_units = archparams.get('lstm_units', [128, 64])
@@ -227,6 +237,7 @@ class TemporalCNNLSTM(BaseModel):
                         kernel_size=self.kernel_size,
                         activation=self.conv_act,
                         padding='same',
+                        dilation_rate=self.dilation_rate,
                         strides=self.strides,
                         kernel_initializer=self.initializer,
                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
@@ -237,6 +248,7 @@ class TemporalCNNLSTM(BaseModel):
                         kernel_size=self.kernel_size,
                         activation=self.conv_act,
                         padding='same',
+                        dilation_rate=self.dilation_rate,
                         strides=self.strides,
                         kernel_initializer=self.initializer,
                         kernel_regularizer=regularizers.l2(self.kernel_regularizer)))
