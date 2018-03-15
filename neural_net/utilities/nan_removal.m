@@ -28,7 +28,7 @@ for a = 1 : 9
         if any(any(isnan(data_removed(a).image(:,:,k))))
             % delete entire trial
             data_removed(a).image(:,:,k) = [];
-            data_removed(a).type(1) = [];
+            data_removed(a).type(k) = [];
         end
     end 
 end

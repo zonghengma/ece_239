@@ -1,5 +1,6 @@
 import keras.optimizers as optimizers
 import keras.callbacks
+from keras.callbacks import EarlyStopping
 
 class BaseModel(object):
   """Base class representing a complete neural net architecture.
@@ -98,9 +99,13 @@ class BaseModel(object):
     verbose = params['verbose']
 
     # Perform the actual training.
+    early_stop = EarlyStopping(monitor='val_loss',
+                               min_delta=0,
+                               patience=20,
+                               verbose=0, mode='auto')
     self.__history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
                                epochs=epochs, verbose=verbose,
-                               validation_data=validation_data)
+                               validation_data=validation_data, callbacks=[early_stop])
 
   def __compile(self):
     """Helper function that calls the compile function of the model."""
