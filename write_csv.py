@@ -26,28 +26,29 @@ for lr in learning_rates:
       for cu in conv_units:
         for ks in kernel_size:
           for ps in pool_size:
-            for pstr in pool_stride:
-              for ddrin dilation_rate:
+            for pstr in pool_strides:
+              for dr in dilation_rate:
                 for cd in conv_dropout:
                   for lu in lstm_units:
                     for ld in lstm_dropout:
-                      for du in dense_Units:
+                      for du in dense_units:
                         for ddp in dense_dropout:
-                          writer.writerow({
-                            'learning_rate': lr,
-                            'lr_decay': decay,
-                            'batch_size': bs,
-                            'conv_units': cu,
-                            'kernel_size': ks,
-                            'pool_size': ps,
-                            'pool_strides': pstr,
-                            'dilation_rate': dr,
-                            'conv_dropout': cd,
-                            'lstm_units': lu,
-                            'lstm_dropout': ld,
-                            'dense_units': du,
-                            'dense_dropout': ddp
-                          })
+                          if len(cu) == len(ps) and len(ps) == len(pstr) and len(pstr) == (cd):
+                            writer.writerow({
+                              'learning_rate': lr,
+                              'lr_decay': decay,
+                              'batch_size': bs,
+                              'conv_units': cu,
+                              'kernel_size': ks,
+                              'pool_size': ps,
+                              'pool_strides': pstr,
+                              'dilation_rate': dr,
+                              'conv_dropout': cd,
+                              'lstm_units': lu,
+                              'lstm_dropout': ld,
+                              'dense_units': du,
+                              'dense_dropout': ddp
+                            })
 
 #writer.writerow({
 #  'learning_rate': 5e-5,
