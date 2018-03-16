@@ -2,14 +2,13 @@ from neural_net.data_access.read_project_data import DataReader, DataLoader
 from neural_net.architecture.fc_nets import ThreeLayerFcNet
 from neural_net.architecture.Model import StackedLSTM, CNNLSTM, TemporalCNNLSTM, vanilaCNN2D
 from neural_net.data_process.data_processor import DataProcessor
-from neural_net.architecture.autoencoder import AutoEncoder
 from keras.datasets import mnist
 from keras.utils import np_utils
 import numpy as np
 import csv
 
 
-data_file_path = "neural_net\\data_access\\processed_datasets\\new_preprocess_clean_image_nx8x6x7x3.npz"
+data_file_path = "neural_net/data_access/processed_datasets/new_preprocess_clean_image_nx8x6x7x3.npz"
 config_file_path = "config.csv"
 
 dl = DataLoader(data_file_path)
