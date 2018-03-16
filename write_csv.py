@@ -2,19 +2,19 @@ import csv
 
 field_names = ['learning_rate', 'lr_decay', 'batch_size', 'conv_units', 'kernel_size', 'pool_size', 'pool_strides', 'dilation_rate', 'conv_dropout', 'lstm_units', 'lstm_dropout', 'dense_units', 'dense_dropout']
 
-learning_rates = []
-lr_decay = []
-batch_size = []
-conv_units = []
-kernel_size = []
-pool_size = []
-pool_strides = []
-dilation_rate = []
-conv_dropout = []
-lstm_units = []
-lstm_dropout = []
-dense_units = []
-dense_dropout = []
+learning_rates = [1e-3]
+lr_decay = [0.001]
+batch_size = [32]
+conv_units = [[64, 64],[32, 32],[32, 32, 64, 64]]
+kernel_size = [[2, 2]]
+pool_size = [[1, 2],[1,2,1,1]]
+pool_strides = [[1, 2],[1,2,1,1]]
+dilation_rate = [1]
+conv_dropout = [[0, 0],[0,0,0,0]]
+lstm_units = [[128]]
+lstm_dropout = [0]
+dense_units = [[512]]
+dense_dropout = [0.5]
 
 csv_file = open("config.csv", "w", newline='')
 writer = csv.DictWriter(csv_file, field_names)
@@ -33,7 +33,7 @@ for lr in learning_rates:
                     for ld in lstm_dropout:
                       for du in dense_units:
                         for ddp in dense_dropout:
-                          if len(cu) == len(ps) and len(ps) == len(pstr) and len(pstr) == (cd):
+                          if len(cu) == len(ps) and len(ps) == len(pstr) and len(pstr) == len(cd):
                             writer.writerow({
                               'learning_rate': lr,
                               'lr_decay': decay,
