@@ -9,7 +9,7 @@ import numpy as np
 import csv
 
 
-data_file_path = "neural_net\\data_access\\processed_datasets\\new_preprocess_clean_image_nx8x6x7x3.npz"
+data_file_path = "neural_net/data_access/processed_datasets/new_preprocess_clean_image_nx8x6x7x3.npz"
 config_file_path = "config.csv"
 
 dl = DataLoader(data_file_path)
