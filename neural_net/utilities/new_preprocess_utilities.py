@@ -89,10 +89,10 @@ def pre_process(X, y):
   # X is diff shape now, image format.
   X, y = split_into_timesteps(X, y)
   # X is diff shape now, timesplit and image format.
-  # X, y = get_freq_domain_3channels(X, y)
-  # X, y = normalize_image_0_1_by_3channel(X, y)
-  X, y = get_freq_domain_6channels(X, y)
-  X, y = normalize_image_0_1_by_6channel(X, y)
+  X, y = get_freq_domain_3channels(X, y)
+  X, y = normalize_image_0_1_by_3channel(X, y)
+  # X, y = get_freq_domain_6channels(X, y)
+  # X, y = normalize_image_0_1_by_6channel(X, y)
   # Final shape is [trials, num_timesections, rows, cols, num_freqs]
   # Full dataset:  [2558, 8, 6, 7, 3 or 6]
 
