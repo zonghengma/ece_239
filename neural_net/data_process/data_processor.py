@@ -37,6 +37,11 @@ class DataProcessor(object):
     # Save the model's parameters to the main save file in output/.
     model_info = self.__network.get_params()
     model_info['run_id'] = basename
+    # Stuff with the training and validation results.
+    model_info['min_train_loss'] = self.__results['min_train_loss']
+    model_info['max_train_acc'] = self.__results['max_train_acc']
+    model_info['min_val_loss'] = self.__results['min_val_loss']
+    model_info['max_val_acc'] = self.__results['max_val_acc']
     csv_saver = CsvSaver()
     csv_saver.append_to_file(outputs_dir, filename, model_info)
 

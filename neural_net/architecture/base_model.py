@@ -71,6 +71,13 @@ class BaseModel(object):
                     k + ', cannot have duplicate keys')
       params[k] = v
 
+    for k, v in self.__results.items():
+      # Raise an error if there's any parameter overlap.
+      if k in params:
+        raise Error('Found duplicate key in output params: ' + k +
+                    ' cannot have duplicate keys')
+      params[k] = v
+
     # Insert name.
     params['model_name'] = self.__name
 
@@ -110,6 +117,11 @@ class BaseModel(object):
     y_test = training_data['y_test']
     res = model.evaluate(x=X_test, y=y_test)
     print('Testing loss: ' + str(res[0]) + ', testing accuracy: ' + str(res[1]))
+    # Save the results as attr.
+    self.__results = {
+      'test_loss': res[0],
+      'test_acc': res[1]
+    }
 
   def __compile(self):
     """Helper function that calls the compile function of the model."""
