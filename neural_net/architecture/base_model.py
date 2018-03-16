@@ -107,8 +107,9 @@ class BaseModel(object):
                                epochs=epochs, verbose=verbose,
                                validation_data=validation_data, callbacks=[early_stop])
     X_test = training_data['X_test']
-    y_test = training_Data['y_test']
-    model.evaluate(x=X_test, y=y_test)
+    y_test = training_data['y_test']
+    res = model.evaluate(x=X_test, y=y_test)
+    print('Testing loss: ' + str(res[0]) + ', testing accuracy: ' + str(res[1]))
 
   def __compile(self):
     """Helper function that calls the compile function of the model."""
