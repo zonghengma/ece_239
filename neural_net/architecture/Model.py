@@ -46,7 +46,6 @@ class StackedLSTM(BaseModel):
                           return_sequences=len(self.lstm_units) > 1,
                           activation=self.lstm_act,
                           dropout=self.lstm_dropout,
-                          kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                           kernel_initializer=self.initializer,
                           input_shape=(self.timestep, self.channels)))
     
@@ -55,7 +54,6 @@ class StackedLSTM(BaseModel):
       model.add(LSTM(self.lstm_units[i], 
                             return_sequences=True,
                             activation=self.lstm_act,
-                            kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                             kernel_initializer=self.initializer,
                             dropout=self.lstm_dropout))
     
@@ -63,7 +61,6 @@ class StackedLSTM(BaseModel):
     if len(self.lstm_units) > 1:
       model.add(LSTM(self.lstm_units[-1],
                             activation=self.lstm_act,
-                            kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                             kernel_initializer=self.initializer,
                             dropout=self.lstm_dropout))
 
@@ -151,6 +148,7 @@ class CNNLSTM(BaseModel):
                                         kernel_regularizer=regularizers.l2(self.kernel_regularizer),
                                         padding='same')))
       #pdb.set_trace()
+      #model.add(BatchNormalization())
       model.add(Dropout(self.conv_dropout[i]))
       model.add(TimeDistributed(MaxPooling2D(pool_size=self.pool_size[i], strides=self.pool_strides[i])))
       #model.add(BatchNormalization())

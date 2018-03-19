@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import matplotlib.pyplot as plt
 from neural_net.data_process.csv_saver import CsvSaver
+import csv
 
 class DataProcessor(object):
   """Data processing class.
@@ -52,7 +53,22 @@ class DataProcessor(object):
       if not os.path.isdir(dirpath):
         os.mkdir(dirpath)
 
+      self.__save_history_data(dirpath, basename)
       self.__save_history_images(dirpath, basename)
+
+  def __save_history_data(self, dirpath, basename):
+    results = self.__results
+    training_loss = results['train_loss_history']
+    training_acc = results['train_acc_history']
+    val_loss = results['val_loss_history']
+    val_acc = results['val_acc_history']
+
+    with open(os.path.join(dirpath, basename + '.csv'), 'w', newline='') as csvfile:
+      writer = csv.writer(csvfile, delimiter=',')
+      writer.writerow(['Training loss', 'Training accuracy', 'Validation loss', 'Validation accuracy'])
+      for tl, ta, vl, va in zip(training_loss, training_acc, val_loss, val_acc):
+        writer.writerow([tl, ta, vl, va])
+      
 
   def __save_history_images(self, dirpath, basename):
     """Creates the desired directory and then puts image history data into it.

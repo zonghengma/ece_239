@@ -107,12 +107,16 @@ class BaseModel(object):
 
     # Perform the actual training.
     early_stop = EarlyStopping(monitor='val_loss',
-                               min_delta=0.01,
-                               patience=20,
+                               min_delta=0.003,
+                               patience=50,
                                verbose=0, mode='auto')
+    reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
+                                                  factor=0.1,
+                                                  patience=10,
+                                                  verbose=1)
     self.__history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
                                epochs=epochs, verbose=verbose,
-                               validation_data=validation_data, callbacks=[early_stop])
+                               validation_data=validation_data, callbacks=[early_stop, reduce_lr])
     X_test = training_data['X_test']
     y_test = training_data['y_test']
     res = model.evaluate(x=X_test, y=y_test)
