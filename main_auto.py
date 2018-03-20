@@ -8,7 +8,7 @@ import numpy as np
 import csv
 
 
-data_file_path = "neural_net/data_access/processed_datasets/new_preprocess_clean_image_nx8x6x7x3.npz"
+data_file_path = "neural_net/data_access/processed_datasets/new_preprocess_freq_image_nx8x6x7x3.npz"
 config_file_path = "config.csv"
 
 dl = DataLoader(data_file_path)
@@ -30,24 +30,25 @@ data = {
 csv_file = open(config_file_path, 'r', newline='')
 csv_reader = csv.DictReader(csv_file)
 
-for row in csv_reader:
+for idx, row in enumerate(csv_reader):
+  print(idx)
   hyperparams = {}
   hyperparams['optimizer'] = 'adam'
   hyperparams['learning_rate'] = float(row['learning_rate'])
   hyperparams['lr_decay']      = float(row['lr_decay'])
   hyperparams['loss_function'] = 'categorical_crossentropy'
   hyperparams['batch_size']    = int(row['batch_size'])
-  hyperparams['epochs']        = 300
-  hyperparams['verbose']       = 1
+  hyperparams['epochs']        = 500
+  hyperparams['verbose']       = 2
   
   
   archparams = {}
   archparams['input_dim'] = X_train.shape
   archparams['channels'] = 3
-  archparams['kernel_regularizer'] = 0.0001
+  archparams['kernel_regularizer'] = 0.005
   archparams['initializer']        = 'glorot_uniform'       
   archparams['conv_units']         = eval(row['conv_units'])
-  archparams['conv_activation']    = 'relu'
+  archparams['conv_activation']    = 'elu'
   archparams['kernel_size']        = eval(row['kernel_size'])
   archparams['pool_size']          = eval(row['pool_size'])
   archparams['pool_strides']       = eval(row['pool_strides'])

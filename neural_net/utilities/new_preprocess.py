@@ -8,8 +8,8 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 
 # Input parameters.
-subjects = range(1,10)
-output_filename = 'new_preprocess_freq_image_nx8x6x7x3.npz'
+subjects = range(1,2)
+output_filename = 'new_preprocess_freq_image_nx8x6x7x3_subj1.npz'
 num_tests = 50
 fraction_validation_size = .2
 
@@ -30,7 +30,7 @@ y_val = y_shuffle[num_tests: validation_size + num_tests]
 X_train = X_shuffle[validation_size + num_tests:, :, :]
 y_train = y_shuffle[validation_size + num_tests:]
 
-pdb.set_trace()
+#pdb.set_trace()
 # Data save.
 base_output_directory = '../data_access/processed_datasets/'
 np.savez(base_output_directory + output_filename, X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test)

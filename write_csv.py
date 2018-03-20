@@ -2,19 +2,19 @@ import csv
 
 field_names = ['learning_rate', 'lr_decay', 'batch_size', 'conv_units', 'kernel_size', 'pool_size', 'pool_strides', 'dilation_rate', 'conv_dropout', 'lstm_units', 'lstm_dropout', 'dense_units', 'dense_dropout']
 
-learning_rates = [1e-3]
-lr_decay = [0.001]
+learning_rates = [5e-4]
+lr_decay = [0]
 batch_size = [32]
-conv_units = [[64, 64],[32, 32],[32, 32, 64, 64]]
+conv_units = [[20,16]]
 kernel_size = [[2, 2]]
-pool_size = [[1, 2],[1,2,1,1]]
-pool_strides = [[1, 2],[1,2,1,1]]
+pool_size = [[1, 2]]
+pool_strides = [[1, 2]]
 dilation_rate = [1]
-conv_dropout = [[0, 0],[0,0,0,0]]
-lstm_units = [[128]]
-lstm_dropout = [0]
-dense_units = [[512]]
-dense_dropout = [0.5]
+conv_dropout = [[0, 0]]
+lstm_units = [[86],[96],[128]]
+lstm_dropout = [0.4,0.45,0.5]
+dense_units = [[512],[768]]
+dense_dropout = [0.5,0.6]
 
 csv_file = open("config.csv", "w", newline='')
 writer = csv.DictWriter(csv_file, field_names)

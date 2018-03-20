@@ -107,8 +107,8 @@ class BaseModel(object):
 
     # Perform the actual training.
     early_stop = EarlyStopping(monitor='val_loss',
-                               min_delta=0.003,
-                               patience=50,
+                               min_delta=0.05,
+                               patience=20,
                                verbose=0, mode='auto')
     reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                   factor=0.1,
