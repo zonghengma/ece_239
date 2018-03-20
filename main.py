@@ -9,10 +9,10 @@ import numpy as np
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_all.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1.npz")
 # dl = DataLoader("neural_net\\data_access\\processed_datasets\\nan_winsor_normalized_freq_subj1-8.npz")
-dl = DataLoader("neural_net/data_access/processed_datasets/nan_winsor_normalized_all.npz")
+# dl = DataLoader("neural_net/data_access/processed_datasets/nan_winsor_normalized_all.npz")
 #dl = DataLoader("neural_net/data_access/processed_datasets/nan_winsor_normalized_subj1.npz")
 #dl = DataLoader("neural_net/data_access/processed_datasets/nan_winsor_normalized_freq_subj1.npz")
-#dl = DataLoader("neural_net/data_access/processed_datasets/new_preprocess_freq_image_nx8x6x7x3.npz")
+dl = DataLoader("neural_net/data_access/processed_datasets/new_preprocess_freq_image_nx8x6x7x3.npz")
 #dl = DataLoader("neural_net/data_access/processed_datasets/new_preprocess_freq_image_nx8x6x7x3_subj1.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\winsor_all_img_split.npz")
 #dl = DataLoader("neural_net\\data_access\\processed_datasets\\winsor_all.npz")
@@ -45,7 +45,7 @@ hyperparams['learning_rate'] = 5e-5
 hyperparams['lr_decay'] = 0
 hyperparams['loss_function'] = 'categorical_crossentropy'
 hyperparams['batch_size'] = 32
-hyperparams['epochs'] = 300
+hyperparams['epochs'] = 500
 hyperparams['verbose'] = 2
 
 
@@ -70,53 +70,53 @@ archparams = {}
 ###########
 # CNNLSTM #
 ###########
-#archparams['input_dim'] = X_train.shape
-#archparams['channels'] = 3
-#archparams['kernel_regularizer'] = 0.005
-#archparams['initializer'] = 'glorot_uniform'
-#archparams['conv_units'] = [32, 32]
-#archparams['conv_activation'] = 'elu'
-#archparams['kernel_size'] = (2, 2)
-#archparams['pool_size'] = (1, 2)
-#archparams['pool_strides'] = archparams['pool_size']
-#archparams['dilation_rate'] = 1
-#archparams['conv_dropout'] = [0, 0]
-#archparams['lstm_units'] = [96]
-#archparams['lstm_activation'] = 'tanh'
-#archparams['lstm_dropout'] = 0.5
-#archparams['dense_units'] = [512]
-#archparams['dense_dropout'] = 0.6
-#
-#
-#net = CNNLSTM(hyperparams, archparams)
-#net.train(data)
-#
-#data_processor = DataProcessor(net)
-#data_processor.save_data_csv(save_history=True)
-
-###################
-# TemporalCNNLSTM #
-###################
 archparams['input_dim'] = X_train.shape
-archparams['kernel_regularizer'] = 0.001
+archparams['channels'] = 3
+archparams['kernel_regularizer'] = 0.005
 archparams['initializer'] = 'glorot_uniform'
-archparams['conv_units'] = [32, 32, 32, 32, 64, 64]
+archparams['conv_units'] = [20, 16]
 archparams['conv_activation'] = 'elu'
-archparams['kernel_size'] = 10
-archparams['strides'] = 1
-archparams['pool_size'] = 5
-archparams['conv_dropout'] = 0
-archparams['lstm_units'] = [128]
+archparams['kernel_size'] = (2, 2)
+archparams['pool_size'] = (1, 2)
+archparams['pool_strides'] = archparams['pool_size']
+archparams['dilation_rate'] = 1
+archparams['conv_dropout'] = [0, 0]
+archparams['lstm_units'] = [96]
 archparams['lstm_activation'] = 'tanh'
 archparams['lstm_dropout'] = 0.5
 archparams['dense_units'] = [512]
-archparams['dense_dropout'] = 0.4
+archparams['dense_dropout'] = 0.6
 
-net = TemporalCNNLSTM(hyperparams, archparams)
+
+net = CNNLSTM(hyperparams, archparams)
 net.train(data)
 
 data_processor = DataProcessor(net)
 data_processor.save_data_csv(save_history=True)
+
+###################
+# TemporalCNNLSTM #
+###################
+# archparams['input_dim'] = X_train.shape
+# archparams['kernel_regularizer'] = 0.001
+# archparams['initializer'] = 'glorot_uniform'
+# archparams['conv_units'] = [32, 32, 32, 32, 64, 64]
+# archparams['conv_activation'] = 'elu'
+# archparams['kernel_size'] = 10
+# archparams['strides'] = 1
+# archparams['pool_size'] = 5
+# archparams['conv_dropout'] = 0
+# archparams['lstm_units'] = [128]
+# archparams['lstm_activation'] = 'tanh'
+# archparams['lstm_dropout'] = 0.5
+# archparams['dense_units'] = [512]
+# archparams['dense_dropout'] = 0.4
+
+# net = TemporalCNNLSTM(hyperparams, archparams)
+# net.train(data)
+
+# data_processor = DataProcessor(net)
+# data_processor.save_data_csv(save_history=True)
 
 ###############
 # TemporalCNN #

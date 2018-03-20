@@ -8,8 +8,8 @@ from keras.callbacks import EarlyStopping
 import numpy as np
 
 # Input parameters.
-subjects = range(1,2)
-output_filename = 'new_preprocess_freq_image_nx8x6x7x3_subj1.npz'
+subjects = range(1,10)
+output_filename = 'new_preprocess_freq_image_nx8x6x7x3.npz'
 num_tests = 50
 fraction_validation_size = .2
 
